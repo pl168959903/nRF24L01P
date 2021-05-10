@@ -15,6 +15,8 @@
 #define NRF_CMD_W_TX_PAYLOAD_NOACK  0xB0
 #define NRF_CMD_NOP                 0xFF
 //-------------------------------------------------
+#define NRF_NRF_CMD_MASK 0x1F
+//-------------------------------------------------
 // NRF REG
 #define NRF_REG_CFG 0x00
 #define NRF_REG_CFG_MAKE_RX_RD_POS          (6)
