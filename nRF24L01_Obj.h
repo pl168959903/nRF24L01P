@@ -1,12 +1,9 @@
-#ifndef __NRF24L01_H
-#define __NRF24L01_H
+#ifndef __NRF24L01_OBJ_H
+#define __NRF24L01_OBJ_H
 
-#include <stdint.h>
-#include <stdlib.h>
-#include <stdbool.h>
-#include <string.h>
-
-#include "nRF24L01_Reg.h"
+#include "stdint.h"
+#include "stddef.h"
+#include "stdbool.h"
 
 typedef struct {
     void ( *ReadWrite )( uint8_t readBuf[], uint8_t writeBuf[], size_t size );
@@ -18,4 +15,4 @@ typedef struct {
 }nRF_T;
 
 
-#endif /* __NRF24L01_H */
+#endif /* __NRF24L01_OBJ_H */

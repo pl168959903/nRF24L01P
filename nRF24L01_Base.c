@@ -1,28 +1,8 @@
-#include "nRF24L01_Base.h"
+#include <stdlib.h>
+#include <string.h>
 
-/**
- * @brief  讀取一個字元組
- * @note   
- * @param  nrf: nRF物件結構 nRF物件結構
- * @param  reg: 讀取暫存器位置
- * @param  data: 輸出位址
- * @retval nRF 狀態暫存器 nRF 狀態暫存器
- */
-uint8_t nRF_ReadRegByte( nRF_T* nrf, uint8_t reg, uint8_t* data ) {
-    return nRF_ReadRegArray( nrf, reg, data, 1 );
-}
-
-/**
- * @brief  寫入一個字元組
- * @note   
- * @param  nrf: nRF物件結構 
- * @param  reg: 寫入暫存器位置
- * @param  data: 寫入資料
- * @retval nRF 狀態暫存器 
- */
-uint8_t nRF_WriteRegByte( nRF_T* nrf, uint8_t reg, uint8_t data ) {
-    return nRF_WriteRegArray( nrf, reg, ( uint8_t[] ){ data }, 1 );
-}
+#include "nRF24L01_Obj.h"
+#include "nRF24L01_Reg.h"
 
 /**
  * @brief  連續讀取多個字元組
@@ -72,6 +52,30 @@ uint8_t nRF_WriteRegArray( nRF_T* nrf, uint8_t reg, uint8_t array[], size_t size
 
     free( data );
     return nRF_Status;
+}
+
+/**
+ * @brief  讀取一個字元組
+ * @note   
+ * @param  nrf: nRF物件結構 nRF物件結構
+ * @param  reg: 讀取暫存器位置
+ * @param  data: 輸出位址
+ * @retval nRF 狀態暫存器 nRF 狀態暫存器
+ */
+uint8_t nRF_ReadRegByte( nRF_T* nrf, uint8_t reg, uint8_t* data ) {
+    return nRF_ReadRegArray( nrf, reg, data, 1 );
+}
+
+/**
+ * @brief  寫入一個字元組
+ * @note   
+ * @param  nrf: nRF物件結構 
+ * @param  reg: 寫入暫存器位置
+ * @param  data: 寫入資料
+ * @retval nRF 狀態暫存器 
+ */
+uint8_t nRF_WriteRegByte( nRF_T* nrf, uint8_t reg, uint8_t data ) {
+    return nRF_WriteRegArray( nrf, reg, ( uint8_t[] ){ data }, 1 );
 }
 
 /**

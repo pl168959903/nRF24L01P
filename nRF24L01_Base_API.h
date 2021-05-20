@@ -1,10 +1,7 @@
 #ifndef __NRF24L01_BASE_H
 #define __NRF24L01_BASE_H
 
-
-#include <stdint.h>
-#include <string.h>
-#include "nRF24L01.h"
+#include "nRF24L01_Obj.h"
 
 uint8_t nRF_ReadRegByte( nRF_T* nrf, uint8_t reg, uint8_t *data );
 uint8_t nRF_WriteRegByte( nRF_T* nrf, uint8_t reg, uint8_t data );
