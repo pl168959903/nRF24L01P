@@ -8,6 +8,7 @@
 typedef struct {
     void ( *ReadWrite )( uint8_t readBuf[], uint8_t writeBuf[], size_t size );
     void (*SetCE)(bool cePin);
+    void (*DelayUs)(uint32_t us);
 } nRF_interface_T;
 
 typedef struct {

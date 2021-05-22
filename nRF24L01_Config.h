@@ -1,0 +1,8 @@
+#ifndef __NRF24L01_CONFIG_H
+#define __NRF24L01_CONFIG_H
+
+#define _NRF_T_PD2STBY_US 150
+#define _NRF_T_STBY2A_US 130
+#define _NRF_POWER_ON_RESET_US 100000
+
+#endif /* __NRF24L01_CONFIG_H */

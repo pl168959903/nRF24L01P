@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 
 #include "nRF24L01_Obj.h"
 #include "nRF24L01_Reg.h"
@@ -267,7 +268,7 @@ uint8_t nRF_TxWithoutAutoAck( nRF_T* nrf, uint8_t array[], size_t size ) {
  * @param  nrf: nRF物件結構 
  * @retval nRF 狀態暫存器 
  */
-uint8_t NRF_Nop( nRF_T* nrf ) {
+uint8_t nRF_Nop( nRF_T* nrf ) {
     uint8_t nRF_Status;
     size_t  dataSize = 1;
 

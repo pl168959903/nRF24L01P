@@ -15,6 +15,6 @@ uint8_t nRF_ReuseTx( nRF_T* nrf );
 uint8_t nRF_ReadRxPayloadWide( nRF_T* nrf, uint8_t* payloadWide );
 uint8_t nRF_AckPayload( nRF_T* nrf, uint8_t array[], size_t size, uint8_t ch );
 uint8_t nRF_TxWithoutAutoAck( nRF_T* nrf, uint8_t array[], size_t size );
-uint8_t NRF_Nop( nRF_T* nrf );
+uint8_t nRF_Nop( nRF_T* nrf );
 
 #endif /* __NRF24L01_BASE_H */
