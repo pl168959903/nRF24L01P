@@ -13,14 +13,24 @@ typedef struct {
 
 typedef struct {
     uint8_t addr;
-    bool    isAutoAck : 1;
-    bool    isDynamicPayloadLength : 1;
+    uint8_t payloadWide;
+    bool    autoAckEnabled : 1;
+    bool    dynamicPayloadLengthEnabled : 1; 
     uint8_t ch;
-} nRF_rx_node_t;
+} nRF_node_t;
+
+typedef struct {
+    nRF_node_t * node;
+    uint8_t addrHeader[4];
+    uint8_t *data;
+    uint8_t dataLength;
+} nRF_tx_packet_t;
 
 typedef struct {
     nRF_interface_T *interface;
-    nRF_rx_node_t *  node_t[ 5 ];
+    nRF_node_t *  rxNode[ 5 ];
+    nRF_tx_packet_t * txPacket;
+    bool interruptFlag : 1;
 } nRF_T;
 
 #endif /* __NRF24L01_OBJ_H */

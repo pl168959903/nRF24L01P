@@ -62,31 +62,91 @@ void nRF_Init( nRF_T* obj ) {
 }
 
 void nRF_SetAddressHeader( nRF_T* obj, uint8_t addrHeader[] ) {
-    uint8_t* data = malloc( 5 );
-    memecpy( &data[ 1 ], addrHeader, 4 );
+    uint8_t data[ 5 ];
+    memcpy( &data[ 1 ], addrHeader, 4 );
     nRF_WriteRegArray( obj, NRF_REG_TX_ADDR, data, 5 );
     nRF_WriteRegArray( obj, NRF_REG_RX_ADDR_P1, data, 5 );
-    free( data );
 }
 
-void nRF_AddRxNode( nRF_T* obj, nRF_rx_node_t* node ) {
-    for ( uint8_t i = 0; i < 1; i < 5; i++ ) {
-        if ( obj->node_t == NULL ) {
-            node->ch    = i;
-            obj->node_t = node;
+bool nRF_AddRxNode( nRF_T* obj, nRF_node_t* node ) {
+    // 尋找空通道
+    node->ch = NULL;
+    for ( uint8_t i = 0; i < 5; i++ ) {
+        if ( obj->rxNode[ i ] == NULL ) {
+            node->ch         = i;
+            obj->rxNode[ i ] = node;
         }
     }
-    
-    nRF_WriteRegByte( obj, NRF_REG_RX_ADDR_P1, node->addr ); 
 
-    if((node->isAutoAck | node->isDynamicPayloadLength) == true){
+    // 通道建立失敗
+    if ( node->ch == NULL ) return false;
 
-    }
+    // 寫入接收位址
+    nRF_WriteRegByte( obj, NRF_REG_RX_ADDR_P1 + node->ch, node->addr );
 
-    
+    // 啟用通道
     nRF_OrWriteRegister( obj, NRF_REG_EN_RXADDR, 0x1 << node->ch );
-    if ( node->isAutoAck == true ) { nRF_OrWriteRegister( obj, NRF_REG_EN_AA, 0x1 << node->ch | 0x1 ); }
-    if(node->isDynamicPayloadLength == true ){
-        nRF_OrWriteRegister( obj, )
+
+    // 設定自動ACK功能
+    if ( ( node->autoAckEnabled | node->dynamicPayloadLengthEnabled ) == true ) {
+        nRF_OrWriteRegister( obj, NRF_REG_EN_AA, 0x1 << node->ch );  //
     }
+
+    // 設定 動態;靜態 有效負載長度
+    if ( node->dynamicPayloadLengthEnabled == true ) {
+        nRF_OrWriteRegister( obj, NRF_REG_DYNPD, 0x1 << node->ch );  //
+    }
+    else {
+        nRF_OrWriteRegister( obj, ( uint8_t )( NRF_REG_RX_PW_P1 + node->ch ), node->payloadWide );
+    }
+
+    return true;
+}
+
+void nRF_TxSendPacket( nRF_T* obj, nRF_tx_packet_t* txPacket ) {
+    // 檢查傳送設定是否與上次相同
+    if ( obj->txPacket != txPacket ) {
+
+        // 設定 TX地址
+        uint8_t DestAddress[ 5 ];
+        memcpy( &DestAddress[ 1 ], txPacket->addrHeader, 4 );
+        DestAddress[ 0 ] = txPacket->node->addr;
+        nRF_WriteRegArray( obj, NRF_REG_TX_ADDR, DestAddress, 5 );
+
+        // RX P0相關設定
+        if ( ( txPacket->node->autoAckEnabled | txPacket->node->dynamicPayloadLengthEnabled ) == true ) {
+            nRF_WriteRegArray( obj, NRF_REG_RX_ADDR_P0, DestAddress, 5 );  //地址
+            nRF_OrWriteRegister( obj, NRF_REG_EN_RXADDR, 0x1 << 0 );       //通道啟用
+            nRF_OrWriteRegister( obj, NRF_REG_EN_AA, 0x1 << 0 );           // 自動ACK
+        }
+
+        //動態負載長度設定
+        if ( txPacket->node->dynamicPayloadLengthEnabled ) {
+            nRF_OrWriteRegister( obj, NRF_REG_DYNPD, 0x1 << 0 );  // 開啟P0動態負載長度
+        }
+        else {
+            nRF_AndWriteRegister( obj, NRF_REG_DYNPD, 0x1 << 0 );                    // 關閉P0動態負載長度
+            nRF_WriteRegByte( obj, NRF_REG_RX_PW_P0, txPacket->node->payloadWide );  // 設定P0靜態負載長度
+        }
+    }
+
+    // 動態負載長度傳送
+    if ( txPacket->node->dynamicPayloadLengthEnabled == true ) {
+        nRF_TxPayload( obj, txPacket->data, ( ( txPacket->dataLength > 32 ) ? 32 : txPacket->dataLength ) );  //
+    }
+    // 靜態負載長度傳送
+    else {
+        uint8_t* sendData = malloc( txPacket->node->payloadWide );
+        memcpy( sendData, txPacket->data, txPacket->node->payloadWide );
+        nRF_TxPayload( obj, sendData, txPacket->node->payloadWide );
+        free( sendData );
+    }
+
+    while(true){
+        
+    }
+}
+
+void nRF_InterruptHookFunciation(nRF_T* obj){
+    obj->interruptFlag = true;
 }

@@ -1,1 +1,7 @@
 *.exe
+*.ZGR
+*.o
+*.d
+.vscode/
+Objects/
+Listings/
