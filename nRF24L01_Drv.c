@@ -142,9 +142,29 @@ void nRF_TxSendPacket( nRF_T* obj, nRF_tx_packet_t* txPacket ) {
         free( sendData );
     }
 
-    while(true){
+    // 等待中斷信號
+    while (obj->interruptFlag == false) {};
+
+    // 取得中斷狀態
+    uint8_t interruptFlag = nRF_Nop(obj);
+
+
+    // 傳輸成功
+    if(interruptFlag & NRF_REG_STATUS_TX_DS_MSK){
+        // 傳輸成功並且ACK封包有RX負載
+        if(interruptFlag & NRF_REG_STATUS_RX_DR_MSK){
+
+        }
+    }
+    // 傳輸操作超時
+    else if (interruptFlag & NRF_REG_STATUS_MAX_RT_MSK){
         
     }
+
+    // 清除中斷旗標
+    nRF_WriteRegByte( obj, NRF_REG_STATUS, interruptFlag);
+    obj->interruptFlag = false;
+    
 }
 
 void nRF_InterruptHookFunciation(nRF_T* obj){
