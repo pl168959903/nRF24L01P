@@ -35,30 +35,20 @@ void nRF_Init( nRF_T* obj ) {
     nRF_ClearInterruptFlag( obj );
 
     nRF_WriteRegByte( obj, NRF_REG_CFG, 0x08 );
-    nRF_WriteRegByte( obj, NRF_REG_EN_AA, 0x3F );
-    nRF_WriteRegByte( obj, NRF_REG_EN_RXADDR, 0x03 );
+    nRF_WriteRegByte( obj, NRF_REG_EN_AA, 0x00 );
+    nRF_WriteRegByte( obj, NRF_REG_EN_RXADDR, 0x00 );
     nRF_WriteRegByte( obj, NRF_REG_SETUP_AW, 0x03 );
-    nRF_WriteRegByte( obj, NRF_REG_SETUP_RETR, 0x03 );
+    nRF_WriteRegByte( obj, NRF_REG_SETUP_RETR, 0xFF );
     nRF_WriteRegByte( obj, NRF_REG_RF_CH, 0x02 );
     nRF_WriteRegByte( obj, NRF_REG_RF_SETUP, 0x0F );
-    nRF_WriteRegByte( obj, NRF_REG_OBSERVE_TX, 0x00 );
-    nRF_WriteRegByte( obj, NRF_REG_CD, 0x00 );
-    nRF_WriteRegArray( obj, NRF_REG_RX_ADDR_P0, ( uint8_t[] ){ 0xE7, 0xE7, 0xE7, 0xE7, 0xE7 }, 5 );
-    nRF_WriteRegArray( obj, NRF_REG_RX_ADDR_P1, ( uint8_t[] ){ 0xC2, 0xC2, 0xC2, 0xC2, 0xC2 }, 5 );
-    nRF_WriteRegByte( obj, NRF_REG_RX_ADDR_P2, 0xC3 );
-    nRF_WriteRegByte( obj, NRF_REG_RX_ADDR_P3, 0xC4 );
-    nRF_WriteRegByte( obj, NRF_REG_RX_ADDR_P4, 0xC5 );
-    nRF_WriteRegByte( obj, NRF_REG_RX_ADDR_P5, 0xC6 );
-    nRF_WriteRegArray( obj, NRF_REG_TX_ADDR, ( uint8_t[] ){ 0xE7, 0xE7, 0xE7, 0xE7, 0xE7 }, 5 );
     nRF_WriteRegByte( obj, NRF_REG_RX_PW_P0, 0x00 );
     nRF_WriteRegByte( obj, NRF_REG_RX_PW_P1, 0x00 );
     nRF_WriteRegByte( obj, NRF_REG_RX_PW_P2, 0x00 );
     nRF_WriteRegByte( obj, NRF_REG_RX_PW_P3, 0x00 );
     nRF_WriteRegByte( obj, NRF_REG_RX_PW_P4, 0x00 );
     nRF_WriteRegByte( obj, NRF_REG_RX_PW_P5, 0x00 );
-    nRF_WriteRegByte( obj, NRF_REG_FIFO_STATUS, 0x11 );
     nRF_WriteRegByte( obj, NRF_REG_DYNPD, 0x00 );
-    nRF_WriteRegByte( obj, NRF_REG_FEATURE, 0x00 );
+    nRF_WriteRegByte( obj, NRF_REG_FEATURE, 0x07 );
 }
 
 void nRF_SetAddressHeader( nRF_T* obj, uint8_t addrHeader[] ) {
@@ -97,13 +87,31 @@ bool nRF_AddRxNode( nRF_T* obj, nRF_node_t* node ) {
         nRF_OrWriteRegister( obj, NRF_REG_DYNPD, 0x1 << node->ch );  //
     }
     else {
-        nRF_OrWriteRegister( obj, ( uint8_t )( NRF_REG_RX_PW_P1 + node->ch ), node->payloadWide );
+        nRF_WriteRegByte( obj, ( uint8_t )( NRF_REG_RX_PW_P1 + node->ch ), node->payloadWide );
     }
 
     return true;
 }
 
-void nRF_TxSendPacket( nRF_T* obj, nRF_tx_packet_t* txPacket ) {
+void nRF_RemovalRxNode( nRF_T* obj, nRF_node_t* node ) {
+
+    nRF_AndWriteRegister( obj, NRF_REG_EN_RXADDR, ~( 0x1 << node->ch ) );
+    nRF_AndWriteRegister( obj, NRF_REG_EN_AA, ~( 0x1 << node->ch ) );
+    nRF_AndWriteRegister( obj, NRF_REG_DYNPD, ~( 0x1 << node->ch ) );
+    nRF_WriteRegByte( obj, ( uint8_t )( NRF_REG_RX_PW_P1 + node->ch ), 0x00 );
+
+    for ( uint8_t i = 0; i < 5; i++ ) {
+        if ( obj->rxNode[ i ] == node ) {
+            node->ch         = NULL;
+            obj->rxNode[ i ] = NULL;
+        }
+    }
+}
+
+bool nRF_TxPacket( nRF_T* obj, nRF_tx_packet_t* txPacket ) {
+
+    uint8_t retval;
+
     // 檢查傳送設定是否與上次相同
     if ( obj->txPacket != txPacket ) {
 
@@ -125,7 +133,7 @@ void nRF_TxSendPacket( nRF_T* obj, nRF_tx_packet_t* txPacket ) {
             nRF_OrWriteRegister( obj, NRF_REG_DYNPD, 0x1 << 0 );  // 開啟P0動態負載長度
         }
         else {
-            nRF_AndWriteRegister( obj, NRF_REG_DYNPD, 0x1 << 0 );                    // 關閉P0動態負載長度
+            nRF_AndWriteRegister( obj, NRF_REG_DYNPD, ~( 0x1 << 0 ) );               // 關閉P0動態負載長度
             nRF_WriteRegByte( obj, NRF_REG_RX_PW_P0, txPacket->node->payloadWide );  // 設定P0靜態負載長度
         }
     }
@@ -143,30 +151,65 @@ void nRF_TxSendPacket( nRF_T* obj, nRF_tx_packet_t* txPacket ) {
     }
 
     // 等待中斷信號
-    while (obj->interruptFlag == false) {};
+    while ( obj->interruptFlag == false ) {};
 
     // 取得中斷狀態
-    uint8_t interruptFlag = nRF_Nop(obj);
-
+    uint8_t interruptFlag = nRF_Nop( obj );
 
     // 傳輸成功
-    if(interruptFlag & NRF_REG_STATUS_TX_DS_MSK){
+    if ( interruptFlag & NRF_REG_STATUS_TX_DS_MSK ) {
         // 傳輸成功並且ACK封包有RX負載
-        if(interruptFlag & NRF_REG_STATUS_RX_DR_MSK){
-
+        if ( interruptFlag & NRF_REG_STATUS_RX_DR_MSK ) {
+            if ( obj->rxNode[ 0 ] != NULL &&             //
+                 obj->rxNode[ 0 ]->buf != NULL &&        //
+                 obj->rxNode[ 0 ]->buf->data != NULL &&  //
+                 ( interruptFlag & NRF_REG_STATUS_RX_P_NO_MSK ) == 0x0 ) {
+                uint8_t data_length;
+                nRF_ReadRxPayloadWide( obj, &data_length );
+                nRF_RxPayload( obj, obj->rxNode[ 0 ]->buf->data, data_length );
+                obj->rxNode[ 0 ]->buf->length = data_length;
+            }
+            else {
+                nRF_FlushRx( obj );
+            }
         }
+
+        // 清除中斷旗標
+        nRF_WriteRegByte( obj, NRF_REG_STATUS, interruptFlag );
+        obj->interruptFlag = false;
+
+        retval = true;
     }
     // 傳輸操作超時
-    else if (interruptFlag & NRF_REG_STATUS_MAX_RT_MSK){
-        
+    else if ( interruptFlag & NRF_REG_STATUS_MAX_RT_MSK ) {
+        retval = false;
+    }
+
+    return retval;
+}
+
+uint8_t nRF_RxPacket( nRF_T* obj ) {
+    uint8_t interruptFlag = nRF_Nop( obj );
+    uint8_t data_length;
+    nRF_ReadRxPayloadWide( obj, &data_length );
+
+    if ( obj->rxNode[ 0 ] != NULL &&       //
+         obj->rxNode[ 0 ]->buf != NULL &&  //
+         obj->rxNode[ 0 ]->buf->data != NULL ) {
+        nRF_RxPayload( obj, obj->rxNode[ interruptFlag & NRF_REG_STATUS_RX_P_NO_MSK ]->buf->data, data_length );
+        obj->rxNode[ interruptFlag & NRF_REG_STATUS_RX_P_NO_MSK ]->buf->length = data_length;
+    }
+    else {
+        nRF_FlushRx( obj );
     }
 
     // 清除中斷旗標
-    nRF_WriteRegByte( obj, NRF_REG_STATUS, interruptFlag);
+    nRF_WriteRegByte( obj, NRF_REG_STATUS, interruptFlag );
     obj->interruptFlag = false;
-    
+
+    return interruptFlag & NRF_REG_STATUS_RX_P_NO_MSK;
 }
 
-void nRF_InterruptHookFunciation(nRF_T* obj){
+void nRF_InterruptHookFunciation( nRF_T* obj ) {
     obj->interruptFlag = true;
 }

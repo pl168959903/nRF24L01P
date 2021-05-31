@@ -12,20 +12,26 @@ typedef struct {
 } nRF_interface_T;
 
 typedef struct {
+    uint32_t length;
+    uint8_t * data;
+} nRF_buf_t;
+typedef struct {
+    // Init
     uint8_t addr;
     uint8_t payloadWide;
     bool    autoAckEnabled : 1;
-    bool    dynamicPayloadLengthEnabled : 1; 
+    bool    dynamicPayloadLengthEnabled : 1;
+    nRF_buf_t * buf;
+
+    // Param
     uint8_t ch;
 } nRF_node_t;
-
 typedef struct {
     nRF_node_t * node;
     uint8_t addrHeader[4];
     uint8_t *data;
     uint8_t dataLength;
 } nRF_tx_packet_t;
-
 typedef struct {
     nRF_interface_T *interface;
     nRF_node_t *  rxNode[ 5 ];
