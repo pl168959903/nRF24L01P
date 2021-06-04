@@ -393,6 +393,11 @@
               <FileType>1</FileType>
               <FilePath>.\nRF24L01_Drv.c</FilePath>
             </File>
+            <File>
+              <FileName>nRF24L01_Pair.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\nRF24L01_Pair.c</FilePath>
+            </File>
           </Files>
         </Group>
       </Groups>
