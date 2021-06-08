@@ -13,7 +13,7 @@ void nRF_OrWriteRegister( nRF_T* obj, uint8_t reg, uint8_t value );
 void nRF_AndWriteRegister( nRF_T* obj, uint8_t reg, uint8_t value );
 void nRF_ClearInterruptFlag( nRF_T* obj );
 void nRF_Init( nRF_T* obj );
-void nRF_SetAddressHeader( nRF_T* obj, uint8_t addrHeader[] );
+void nRF_SetAddressHeader( nRF_T* obj, uint8_t RxAddressHeader[] );
 bool nRF_AddRxNode( nRF_T* obj, nRF_node_t* node );
 void nRF_RemovalRxNode( nRF_T* obj, nRF_node_t* node );
 bool nRF_TxPacket( nRF_T* obj, nRF_tx_packet_t* txPacket );

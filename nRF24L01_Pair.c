@@ -16,5 +16,5 @@ void nRF_PairServerInit(nRF_T* obj, nRF_pair_t *pair){
     nRF_WriteRegByte( obj, NRF_REG_EN_AA, 0x01);
     nRF_WriteRegByte( obj, NRF_REG_DYNPD, 0x01);
 
-    nRF_WriteRegArray( obj, NRF_REG_RX_ADDR_P0, pair->PairAddress, 5);
+    nRF_WriteRegArray( obj, NRF_REG_RX_ADDR_P0, pair->PairAddress, 5); 
 }
