@@ -68,8 +68,6 @@ typedef struct {
     bool       dynamicPayloadLengthEnabled : 1;  // 動態有效負載量，若為TRUE payloadWide 為無效值。
     nRF_buf_t *buf;                              // 緩衝區結構位址
 
-    // 不需要初始化變量
-    uint8_t ch;  // AddNode 後自動設動通道編號
 } nRF_node_t;
 
 //***********************************************************************
@@ -80,7 +78,7 @@ typedef struct {
  */
 typedef struct {
     nRF_node_t *node;             // 目標節點結構
-    uint8_t     addrHeader[ 4 ];  //目標位址標頭
+    uint8_t     addrHeader[ 4 ];  // 目標位址標頭
     nRF_buf_t * txBuffer;         // 待傳送資料緩衝區結構
     bool        isAlter : 1;      // 設定是否更動
 } nRF_tx_packet_t;
@@ -93,9 +91,10 @@ typedef struct {
  */
 typedef struct {
     // 需要初始化
-    nRF_interface_T *interface;             //介面結構
-    nRF_node_t *     rxNode[ 5 ];           //接收節點結構
-    uint8_t          RxAddressHeader[ 4 ];  // 接收地址標頭
+    nRF_interface_T *interface;                 // 介面結構
+    nRF_node_t *     rxNode[ 6 ];               // 接收節點結構
+    uint8_t          RxAddressHeader_0[ 4 ];    // 通道P0接收地址標頭
+    uint8_t          RxAddressHeader_1_6[ 4 ];  // 通道P1~P6接收地址標頭
 
     // 不需初始化
     nRF_tx_packet_t *txPacket;           // 傳送封包結構

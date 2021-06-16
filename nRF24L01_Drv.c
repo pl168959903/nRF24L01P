@@ -8,7 +8,7 @@
 #include "nRF24L01_Reg.h"
 //***********************************************************************
 /**
- * @brief  暫存器或操作
+ * @brief  暫存器或寫操作
  * @note
  * @param  obj: 目標物件
  * @param  reg: 暫存器
@@ -24,7 +24,7 @@ void nRF_OrWriteRegister( nRF_T* obj, uint8_t reg, uint8_t value ) {
 
 //***********************************************************************
 /**
- * @brief  暫存器及操作
+ * @brief  暫存器及寫操作
  * @note
  * @param  obj: 目標物件
  * @param  reg: 暫存器
@@ -35,6 +35,23 @@ void nRF_AndWriteRegister( nRF_T* obj, uint8_t reg, uint8_t value ) {
     uint8_t regData;
     nRF_ReadRegByte( obj, reg, &regData );
     regData &= value;
+    nRF_WriteRegByte( obj, reg, regData );
+}
+
+//***********************************************************************
+/**
+ * @brief  暫存器遮罩寫操作
+ * @note
+ * @param  obj: 目標物件
+ * @param  reg: 暫存器
+ * @param  value: 操作資料
+ * @param  mask: 資料遮罩
+ * @retval None
+ */
+void nRF_MaskWriteRegister( nRF_T* obj, uint8_t reg, uint8_t value, uint8_t mask ) {
+    uint8_t regData;
+    nRF_ReadRegByte( obj, reg, &regData );
+    regData = ( regData & mask ) | ( value & ~mask );
     nRF_WriteRegByte( obj, reg, regData );
 }
 
@@ -82,19 +99,34 @@ void nRF_Init( nRF_T* obj ) {
     nRF_WriteRegByte( obj, NRF_REG_FEATURE, 0x07 );
 
     // 初始化接收位址標頭
-    nRF_SetAddressHeader( obj, obj->RxAddressHeader );
+    nRF_SetAddressHeader_P0( obj, obj->RxAddressHeader_0 );
+    nRF_SetAddressHeader_P1_6( obj, obj->RxAddressHeader_1_6 );
 }
 
 //***********************************************************************
 /**
- * @brief 設定接收位址標頭
+ * @brief 設定P0接收位址標頭
  * @note
  * @param  obj: 目標物件
  * @retval None
  */
-void nRF_SetAddressHeader( nRF_T* obj, uint8_t RxAddressHeader[] ) {
+void nRF_SetAddressHeader_P0( nRF_T* obj, uint8_t RxAddressHeader[] ) {
     uint8_t Address[ 5 ] = { 0 };
-    memcpy( obj->RxAddressHeader, RxAddressHeader, 4 );
+    memcpy( obj->RxAddressHeader_0, RxAddressHeader, 4 );
+    memcpy( &Address[ 1 ], RxAddressHeader, 4 );
+    nRF_WriteRegArray( obj, NRF_REG_RX_ADDR_P0, Address, 5 );
+}
+
+//***********************************************************************
+/**
+ * @brief 設定P1~P6接收位址標頭
+ * @note
+ * @param  obj: 目標物件
+ * @retval None
+ */
+void nRF_SetAddressHeader_P1_6( nRF_T* obj, uint8_t RxAddressHeader[] ) {
+    uint8_t Address[ 5 ] = { 0 };
+    memcpy( obj->RxAddressHeader_1_6, RxAddressHeader, 4 );
     memcpy( &Address[ 1 ], RxAddressHeader, 4 );
     nRF_WriteRegArray( obj, NRF_REG_RX_ADDR_P1, Address, 5 );
 }
@@ -107,36 +139,31 @@ void nRF_SetAddressHeader( nRF_T* obj, uint8_t RxAddressHeader[] ) {
  * @param  node:  新增的節點結構
  * @retval
  */
-bool nRF_AddRxNode( nRF_T* obj, nRF_node_t* node ) {
-    // 尋找空通道
-    node->ch = NULL;
-    for ( uint8_t i = 0; i < 5; i++ ) {
-        if ( obj->rxNode[ i ] == NULL ) {
-            node->ch         = i;
-            obj->rxNode[ i ] = node;
-        }
-    }
+bool nRF_AddRxNode( nRF_T* obj, nRF_node_t* node, uint8_t ch ) {
 
-    // 通道建立失敗
-    if ( node->ch == NULL ) return false;
+    obj->rxNode[ch] = node;
 
     // 寫入接收位址
-    nRF_WriteRegByte( obj, NRF_REG_RX_ADDR_P1 + node->ch, node->addr );
+    nRF_WriteRegByte( obj, NRF_REG_RX_ADDR_P0 + ch, node->addr );
 
     // 啟用通道
-    nRF_OrWriteRegister( obj, NRF_REG_EN_RXADDR, 0x1 << node->ch );
+    nRF_OrWriteRegister( obj, NRF_REG_EN_RXADDR, 0x1 << ch );
 
     // 設定自動ACK功能
     if ( ( node->autoAckEnabled | node->dynamicPayloadLengthEnabled ) == true ) {
-        nRF_OrWriteRegister( obj, NRF_REG_EN_AA, 0x1 << node->ch );  //
+        nRF_OrWriteRegister( obj, NRF_REG_EN_AA, 0x1 << ch );  //
+    }
+    else {
+        nRF_AndWriteRegister( obj, NRF_REG_EN_AA, ~( 0x1 << ch ) );
     }
 
     // 設定 動態;靜態 有效負載長度
     if ( node->dynamicPayloadLengthEnabled == true ) {
-        nRF_OrWriteRegister( obj, NRF_REG_DYNPD, 0x1 << node->ch );  //
+        nRF_OrWriteRegister( obj, NRF_REG_DYNPD, 0x1 << ch );  //
     }
     else {
-        nRF_WriteRegByte( obj, ( uint8_t )( NRF_REG_RX_PW_P1 + node->ch ), node->payloadWide );
+        nRF_AndWriteRegister( obj, NRF_REG_DYNPD, ~( 0x1 << ch ) );
+        nRF_WriteRegByte( obj, ( uint8_t )( NRF_REG_RX_PW_P0 + ch ), node->payloadWide );  // 設定靜態長度
     }
 
     return true;
@@ -151,18 +178,7 @@ bool nRF_AddRxNode( nRF_T* obj, nRF_node_t* node ) {
  * @retval None
  */
 void nRF_RemovalRxNode( nRF_T* obj, nRF_node_t* node ) {
-
     nRF_AndWriteRegister( obj, NRF_REG_EN_RXADDR, ~( 0x1 << node->ch ) );
-    nRF_AndWriteRegister( obj, NRF_REG_EN_AA, ~( 0x1 << node->ch ) );
-    nRF_AndWriteRegister( obj, NRF_REG_DYNPD, ~( 0x1 << node->ch ) );
-    nRF_WriteRegByte( obj, ( uint8_t )( NRF_REG_RX_PW_P1 + node->ch ), 0x00 );
-
-    for ( uint8_t i = 0; i < 5; i++ ) {
-        if ( obj->rxNode[ i ] == node ) {
-            node->ch         = NULL;
-            obj->rxNode[ i ] = NULL;
-        }
-    }
 }
 
 //***********************************************************************
@@ -259,7 +275,7 @@ bool nRF_TxPacket( nRF_T* obj, nRF_tx_packet_t* txPacket ) {
 //***********************************************************************
 /**
  * @brief  接收封包
- * @note   
+ * @note
  * @param  obj: 目標物件
  * @retval 接收的通道編號
  */
