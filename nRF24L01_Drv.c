@@ -6,6 +6,7 @@
 #include "nRF24L01_Config.h"
 #include "nRF24L01_Obj.h"
 #include "nRF24L01_Reg.h"
+#include "nRF24L01_Drv.h"
 //***********************************************************************
 /**
  * @brief  暫存器或寫操作
@@ -177,8 +178,8 @@ bool nRF_AddRxNode( nRF_T* obj, nRF_node_t* node, uint8_t ch ) {
  * @param  node: 移除的節點結構
  * @retval None
  */
-void nRF_RemovalRxNode( nRF_T* obj, nRF_node_t* node ) {
-    nRF_AndWriteRegister( obj, NRF_REG_EN_RXADDR, ~( 0x1 << node->ch ) );
+void nRF_RemovalRxNode( nRF_T* obj, nRF_node_t* node, uint8_t ch ) {
+    nRF_AndWriteRegister( obj, NRF_REG_EN_RXADDR, ~( 0x1 << ch ) );
 }
 
 //***********************************************************************

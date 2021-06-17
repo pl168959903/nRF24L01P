@@ -17,7 +17,7 @@ void nRF_Init( nRF_T* obj );
 void nRF_SetAddressHeader_P0( nRF_T* obj, uint8_t RxAddressHeader[] );
 void nRF_SetAddressHeader_P1_6( nRF_T* obj, uint8_t RxAddressHeader[] );
 bool nRF_AddRxNode( nRF_T* obj, nRF_node_t* node, uint8_t ch );
-void nRF_RemovalRxNode( nRF_T* obj, nRF_node_t* node );
+void nRF_RemovalRxNode( nRF_T* obj, nRF_node_t* node, uint8_t ch );
 bool nRF_TxPacket( nRF_T* obj, nRF_tx_packet_t* txPacket );
 uint8_t nRF_RxPacket( nRF_T* obj );
 
