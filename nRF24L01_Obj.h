@@ -1,9 +1,9 @@
 #ifndef __NRF24L01_OBJ_H
 #define __NRF24L01_OBJ_H
 
-#include "stdbool.h"
-#include "stddef.h"
-#include "stdint.h"
+#include <stdbool.h>
+#include <stdint.h>
+#include <stdlib.h>
 
 //***********************************************************************
 /**
@@ -63,9 +63,9 @@ typedef struct {
 typedef struct {
     // 需要初始化變量
     uint8_t    addr;                             // 節點位址
-    uint8_t    payloadWide;                      // 有效負載量
-    bool       autoAckEnabled : 1;               // 自動ACK功能
+    uint8_t    payloadWide : 6;                  // 有效負載長度
     bool       dynamicPayloadLengthEnabled : 1;  // 動態有效負載量，若為TRUE payloadWide 為無效值。
+    bool       autoAckEnabled : 1;               // 自動ACK功能
     nRF_buf_t *buf;                              // 緩衝區結構位址
 
 } nRF_node_t;
@@ -77,10 +77,10 @@ typedef struct {
  * @retval None
  */
 typedef struct {
+    
     nRF_node_t *node;             // 目標節點結構
     uint8_t     addrHeader[ 4 ];  // 目標位址標頭
     nRF_buf_t * txBuffer;         // 待傳送資料緩衝區結構
-    bool        isAlter : 1;      // 設定是否更動
 } nRF_tx_packet_t;
 
 //***********************************************************************
