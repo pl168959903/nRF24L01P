@@ -15,10 +15,11 @@
 #define NRF_CMD_W_TX_PAYLOAD_NOACK  0xB0
 #define NRF_CMD_NOP                 0xFF
 //-------------------------------------------------
-#define NRF_NRF_CMD_MASK 0x1F
+#define NRF_NRF_CMD_MASK                0x1F
+#define NRF_CMD_W_ACK_PAYLOAD_CH_MASK   0x07 
 //-------------------------------------------------
 // NRF REG
-#define NRF_REG_CFG 0x00
+#define NRF_REG_CFG                         0x00
 #define NRF_REG_CFG_MAKE_RX_RD_POS          (6)
 #define NRF_REG_CFG_MAKE_RX_RD_MSK          (0x1<<NRF_REG_CFG_MAKE_RX_RD_POS)
 #define NRF_REG_CFG_MAKE_TX_RS_POS          (5)
@@ -176,6 +177,15 @@
 #define NRF_REG_FEATURE_EN_DYN_ACK_MSK      (0x1<<NRF_REG_FEATURE_EN_DYN_ACK_POS)
 
 //-------------------------------------------------
+
+typedef struct{
+    uint8_t tx_full:1;
+    uint8_t rx_p_no:3;
+    uint8_t max_rt:1;
+    uint8_t tx_ds:1;
+    uint8_t rx_dr:1;
+    uint8_t :1;
+} nRF_statusReg_t;
 
 
 #endif /* __NRF24L01_REG_H */

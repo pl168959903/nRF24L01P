@@ -1,8 +1,8 @@
 #ifndef __NRF24L01_DRV_H
 #define __NRF24L01_DRV_H
 
-#include "nRF24L01_Reg.h"
-#include "nRF24L01_Obj.h"
+#include "nRF24L01_Base.h"
+#include "nRF24L01_Config.h"
 
 #define NRF_POWER_ON(obj) nRF_OrWriteRegister(obj, NRF_REG_CFG, NRF_REG_CFG_PWR_UP_MSK)
 #define NRF_POWER_DOWN(obj) nRF_AndWriteRegister(obj, NRF_REG_CFG, NRF_REG_CFG_PWR_UP_MSK)
