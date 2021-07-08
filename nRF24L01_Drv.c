@@ -169,23 +169,25 @@ bool nRF_AddRxNode( nRF_T* obj, nRF_node_t* node, uint8_t ch ) {
  * @note
  * @param  obj: 目標物件
  * @param  node: 移除的節點結構
- * @retval None
+ * @retval NoneP
  */
 void nRF_RemovalRxNode( nRF_T* obj, nRF_node_t* node, uint8_t ch ) {
     nRF_AndWriteRegister( obj, NRF_REG_EN_RXADDR, ~( 0x1 << ch ) );
 }
 //***********************************************************************
 void nRF_TxPacketSettingUpdate( nRF_T* obj, nRF_tx_packet_t* txPacket ) {
+    bool enaa = txPacket->node->autoAckEnabled | txPacket->node->dynamicPayloadLengthEnabled;
+    bool endy = txPacket->node->dynamicPayloadLengthEnabled;
     uint8_t destAddr[ 5 ] = { txPacket->node->addr,  //
                               txPacket->addrHeader[ 0 ],
                               txPacket->addrHeader[ 1 ],
                               txPacket->addrHeader[ 2 ],
                               txPacket->addrHeader[ 3 ] };
     NRF_WRITE_REG_ARRAY( obj, NRF_REG_TX_ADDR, destAddr, 5 );
-    if ( txPacket->node->dynamicPayloadLengthEnabled == true ||  //
-         txPacket->node->autoAckEnabled == true ) {
-             nRF_OrWriteRegister( obj, rxa)
-         }
+    nRF_MaskWriteRegister(obj,NRF_REG_EN_RXADDR, enaa, 0x1);
+    nRF_MaskWriteRegister( obj, NRF_REG_EN_AA, enaa, 0x1 );
+    nRF_MaskWriteRegister( obj, NRF_REG_DYNPD, endy, 0x1 );
+    if(enaa == true) NRF_WRITE_REG_ARRAY( obj, NRF_REG_RX_ADDR_P0, destAddr, 5);
 }
 //***********************************************************************
 /**
