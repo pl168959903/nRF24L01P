@@ -82,7 +82,7 @@ nRF_statusReg_t nRF_SpiCmdRead( nRF_T* nrf, uint8_t command, uint8_t* array, uin
  * @param  length: 讀取大小
  * @retval nRF 狀態暫存器
  */
-#define NRF_RX_PAYLOAD( nrf, array, length ) nRF_SpiCmdRead( nrf, NRF_CMD_RX_PAYLOAD, ( uint8_t* )array, length )
+#define NRF_RX_PAYLOAD( nrf, array, length ) nRF_SpiCmdRead( nrf, NRF_CMD_R_RX_PAYLOAD, ( uint8_t* )( array ), length )
 
 /**
  * @brief  寫入有效附載
@@ -92,7 +92,7 @@ nRF_statusReg_t nRF_SpiCmdRead( nRF_T* nrf, uint8_t command, uint8_t* array, uin
  * @param  length: 寫入字元組大小
  * @retval nRF 狀態暫存器
  */
-#define NRF_TX_PAYLOAD( nrf, array, length ) nRF_SpiCmdWrite( nrf, NRF_CMD_TX_PAYLOAD, ( uint8_t* )array, length )
+#define NRF_TX_PAYLOAD( nrf, array, length ) nRF_SpiCmdWrite( nrf, NRF_CMD_W_TX_PAYLOAD, ( uint8_t* )( array ), length )
 
 /**
  * @brief  清空TX有效附載
@@ -125,7 +125,7 @@ nRF_statusReg_t nRF_SpiCmdRead( nRF_T* nrf, uint8_t command, uint8_t* array, uin
  * @param  payloadWide: 資料長度
  * @retval nRF 狀態暫存器
  */
-#define NRF_READ_RX_PAYLOAD_WIDE( nrf, payloadWide ) nRF_SpiCmdRead( nrf, NRF_CMD_R_RX_PL_WID, ( uint8_t* )payloadWide, 1 )
+#define NRF_READ_RX_PAYLOAD_WIDE( nrf, payloadWide ) nRF_SpiCmdRead( nrf, NRF_CMD_R_RX_PL_WID, ( uint8_t* )( payloadWide ), 1 )
 
 /**
  * @brief  寫入回應有效附載
@@ -136,7 +136,7 @@ nRF_statusReg_t nRF_SpiCmdRead( nRF_T* nrf, uint8_t command, uint8_t* array, uin
  * @param  channel: 回應通道
  * @retval nRF 狀態暫存器
  */
-#define NRF_TX_ACK_PAYLOAD( nrf, array, length, channel ) nRF_SpiCmdWrite( nrf, NRF_CMD_W_ACK_PAYLOAD | ( channel & NRF_CMD_W_ACK_PAYLOAD_CH_MASK ), ( uint8_t* )array, length )
+#define NRF_TX_ACK_PAYLOAD( nrf, array, length, channel ) nRF_SpiCmdWrite( nrf, NRF_CMD_W_ACK_PAYLOAD | ( channel & NRF_CMD_W_ACK_PAYLOAD_CH_MASK ), ( uint8_t* )( array ), length )
 
 /**
  * @brief  寫入有效附載不使用回應
@@ -146,7 +146,7 @@ nRF_statusReg_t nRF_SpiCmdRead( nRF_T* nrf, uint8_t command, uint8_t* array, uin
  * @param  size: 寫入字元組大小
  * @retval nRF 狀態暫存器
  */
-#define NRF_TX_WITHOUT_AUTO_ACK( nrf, array, length ) nRF_SpiCmdWrite( nrf, NRF_CMD_W_TX_PAYLOAD_NOACK, ( uint8_t* )array, length )
+#define NRF_TX_WITHOUT_AUTO_ACK( nrf, array, length ) nRF_SpiCmdWrite( nrf, NRF_CMD_W_TX_PAYLOAD_NOACK, ( uint8_t* )( array ), length )
 
 /**
  * @brief  空操作
@@ -155,5 +155,12 @@ nRF_statusReg_t nRF_SpiCmdRead( nRF_T* nrf, uint8_t command, uint8_t* array, uin
  * @retval nRF 狀態暫存器
  */
 #define NRF_NOP( nrf ) nRF_SpiCmdRead( nrf, NRF_CMD_NOP, NULL, 0 )
+
+/**
+ * @brief  清除狀態暫存器
+ * @note   清除之前必須保證物件內的所儲存的狀態暫存器是否一致，可以使用任何讀寫操作更新。
+ * @retval nRF 狀態暫存器
+ */
+#define NRF_CLEAR_STATUS_REG( nrf) NRF_WRITE_REG_BYTE( nrf, NRF_REG_STATUS, *(uint8_t*)&(nrf->statusRegister))
 
 #endif /* __NRF24L01_BASE_H */

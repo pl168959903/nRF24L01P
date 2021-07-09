@@ -178,14 +178,4 @@
 
 //-------------------------------------------------
 
-typedef struct{
-    uint8_t tx_full:1;
-    uint8_t rx_p_no:3;
-    uint8_t max_rt:1;
-    uint8_t tx_ds:1;
-    uint8_t rx_dr:1;
-    uint8_t :1;
-} nRF_statusReg_t;
-
-
 #endif /* __NRF24L01_REG_H */

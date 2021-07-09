@@ -36,21 +36,19 @@ static CommandBuffer_t* CommandBuffer_create( uint8_t cmd, uint8_t size ) {
 }
 
 nRF_statusReg_t nRF_SpiCmdWrite( nRF_T* nrf, uint8_t command, uint8_t* array, uint8_t length ) {
-    nRF_statusReg_t  status;
     CommandBuffer_t* cmdBuf = CommandBuffer_create( command, length );
     if ( length > 0 ) memcpy( cmdBuf->buffer, array, length );
     nrf->interface->ReadWrite( ( uint8_t* )cmdBuf, ( uint8_t* )cmdBuf, length + 1 );
-    status = cmdBuf->status;
+    nrf->statusRegister = cmdBuf->status;
     free( cmdBuf );
-    return status;
+    return nrf->statusRegister;
 }
 
 nRF_statusReg_t nRF_SpiCmdRead( nRF_T* nrf, uint8_t command, uint8_t* array, uint8_t length ) {
-    nRF_statusReg_t  status;
     CommandBuffer_t* cmdBuf = CommandBuffer_create( command, length );
     nrf->interface->ReadWrite( ( uint8_t* )cmdBuf, ( uint8_t* )cmdBuf, length + 1 );
-    status = cmdBuf->status;
+    nrf->statusRegister = cmdBuf->status;
     if ( length > 0 ) memcpy( array, cmdBuf->buffer, length );
     free( cmdBuf );
-    return status;
+    return nrf->statusRegister;
 }

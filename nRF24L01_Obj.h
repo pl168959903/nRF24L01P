@@ -85,6 +85,25 @@ typedef struct {
 
 //***********************************************************************
 /**
+ * @brief  狀態暫存器結構
+ * @note   
+ * @retval None
+ */
+typedef struct {
+    union {
+        uint8_t dataByte;
+        struct {
+            bool    tx_full : 1;
+            uint8_t rx_p_no : 3;
+            bool    max_rt : 1;
+            bool    tx_ds : 1;
+            bool    rx_dr : 1;
+            bool : 1;
+        };
+    };
+} nRF_statusReg_t;
+//***********************************************************************
+/**
  * @brief  nRF 元件結構
  * @note
  * @retval None
@@ -98,6 +117,7 @@ typedef struct {
 
     // 不需初始化
     nRF_tx_packet_t *txPacket;           // 傳送封包結構
+    nRF_statusReg_t statusRegister; 
     bool             interruptFlag : 1;  // 中斷旗標
 } nRF_T;
 
