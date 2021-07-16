@@ -1,9 +1,5 @@
 #include "nRF24L01_Drv.h"
 
-static const uint8_t nRF_RegInitData[] = {
-    #include "nRF_RegInit.txt"
-};
-
 //***********************************************************************
 /**
  * @brief  暫存器或寫操作
@@ -78,12 +74,15 @@ void nRF_Init( nRF_T* obj ) {
     NRF_FLUSH_TX( obj );            // 清除緩衝區
     NRF_FLUSH_RX( obj );            // 清除緩衝區
     NRF_CLEAR_STATUS_REG(obj) ;// 清除中斷
+    
+    uint8_t regInitData[] = {
+        #include "nRF_RegInit.txt"
+    };
 
     // 初始化暫存器
-    for (size_t i = 0; i < sizeof(nRF_RegInitData); i+=2){
-        NRF_WRITE_REG_BYTE( obj, nRF_RegInitData[i], nRF_RegInitData[i+1] );
+    for (size_t i = 0; i < sizeof(regInitData); i+=2){
+        NRF_WRITE_REG_BYTE( obj, regInitData[i], regInitData[i+1] );
     }
-0.
     // 初始化接收位址標頭
     nRF_SetAddressHeader_P0( obj, obj->RxAddressHeader_0 );
     nRF_SetAddressHeader_P1_6( obj, obj->RxAddressHeader_1_6 );

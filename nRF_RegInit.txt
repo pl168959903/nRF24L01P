@@ -1,15 +1,15 @@
-NRF_REG_CFG, 0x08,         //
-NRF_REG_EN_AA, 0x00,       //
-NRF_REG_EN_RXADDR, 0x00,   //
-NRF_REG_SETUP_AW, 0x03,    //
-NRF_REG_SETUP_RETR, 0xFF,  //
-NRF_REG_RF_CH, 0x02,       //
-NRF_REG_RF_SETUP, 0x0F,    //
-NRF_REG_RX_PW_P0, 0x00,    //
-NRF_REG_RX_PW_P1, 0x00,    //
-NRF_REG_RX_PW_P2, 0x00,    //
-NRF_REG_RX_PW_P3, 0x00,    //
-NRF_REG_RX_PW_P4, 0x00,    //
-NRF_REG_RX_PW_P5, 0x00,    //
-NRF_REG_DYNPD, 0x00,       //
-NRF_REG_FEATURE, 0x07      //
+NRF_REG_CFG         ,   0x08    , //
+NRF_REG_EN_AA       ,   0x00    , //
+NRF_REG_EN_RXADDR   ,   0x00    , //
+NRF_REG_SETUP_AW    ,   0x03    , //
+NRF_REG_SETUP_RETR  ,   0xFF    , //
+NRF_REG_RF_CH       ,   0x02    , //
+NRF_REG_RF_SETUP    ,   0x0F    , //
+NRF_REG_RX_PW_P0    ,   0x00    , //
+NRF_REG_RX_PW_P1    ,   0x00    , //
+NRF_REG_RX_PW_P2    ,   0x00    , //
+NRF_REG_RX_PW_P3    ,   0x00    , //
+NRF_REG_RX_PW_P4    ,   0x00    , //
+NRF_REG_RX_PW_P5    ,   0x00    , //
+NRF_REG_DYNPD       ,   0x00    , //
+NRF_REG_FEATURE     ,   0x07      //
