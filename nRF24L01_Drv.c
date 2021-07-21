@@ -71,51 +71,129 @@ void nRF_ClearInterruptFlag( nRF_T* obj ) {
 void nRF_Init( nRF_T* obj ) {
     obj->interface->DelayUs( _NRF_POWER_ON_RESET_US );  // 上電延時開機
     obj->interface->SetCE( false );
-    NRF_FLUSH_TX( obj );            // 清除緩衝區
-    NRF_FLUSH_RX( obj );            // 清除緩衝區
-    NRF_CLEAR_STATUS_REG(obj) ;// 清除中斷
-    
+    NRF_FLUSH_TX( obj );          // 清除緩衝區
+    NRF_FLUSH_RX( obj );          // 清除緩衝區
+    NRF_CLEAR_STATUS_REG( obj );  // 清除中斷
+
     uint8_t regInitData[] = {
-        #include "nRF_RegInit.txt"
+#include "nRF_RegInit.txt"
     };
 
     // 初始化暫存器
-    for (size_t i = 0; i < sizeof(regInitData); i+=2){
-        NRF_WRITE_REG_BYTE( obj, regInitData[i], regInitData[i+1] );
-    }
-    // 初始化接收位址標頭
-    nRF_SetAddressHeader_P0( obj, obj->RxAddressHeader_0 );
-    nRF_SetAddressHeader_P1_6( obj, obj->RxAddressHeader_1_6 );
+    for ( size_t i = 0; i < sizeof( regInitData ); i += 2 ) { NRF_WRITE_REG_BYTE( obj, regInitData[ i ], regInitData[ i + 1 ] ); }
 }
 
 //***********************************************************************
 /**
- * @brief 設定P0接收位址標頭
- * @note
+ * @brief  一般功能設定
+ * @note   
  * @param  obj: 目標物件
+ * @param  st: 設定資料
  * @retval None
  */
-void nRF_SetAddressHeader_P0( nRF_T* obj, uint8_t RxAddressHeader[] ) {
-    uint8_t Address[ 5 ] = { 0 };
-    memcpy( obj->RxAddressHeader_0, RxAddressHeader, 4 );
-    memcpy( &Address[ 1 ], RxAddressHeader, 4 );
-    NRF_WRITE_REG_ARRAY( obj, NRF_REG_RX_ADDR_P0, Address, 5 );
-}
+void nRF_GeneralSetup( nRF_T* obj, nRF_general_setup_t* st ) {
 
-//***********************************************************************
-/**
- * @brief 設定P1~P6接收位址標頭
- * @note
- * @param  obj: 目標物件
- * @retval None
- */
-void nRF_SetAddressHeader_P1_6( nRF_T* obj, uint8_t RxAddressHeader[] ) {
-    uint8_t Address[ 5 ] = { 0 };
-    memcpy( obj->RxAddressHeader_1_6, RxAddressHeader, 4 );
-    memcpy( &Address[ 1 ], RxAddressHeader, 4 );
-    NRF_WRITE_REG_ARRAY( obj, NRF_REG_RX_ADDR_P1, Address, 5 );
-}
+    //******************************************
+    // NRF_REG_CFG
+    nRF_MaskWriteRegister(
+        obj,
+        NRF_REG_CFG,
+        (                                                         
+            ( st->mask_rx_dr << NRF_REG_CFG_MASK_RX_DR_POS ) |    //
+            ( st->mask_tx_ds << NRF_REG_CFG_MASK_TX_DS_POS ) |    //
+            ( st->mask_max_rt << NRF_REG_CFG_MASK_MAX_RT_POS ) |  //
+            ( st->crc_en << NRF_REG_CFG_EN_CRC_POS ) |            //
+            ( st->crc_byte << NRF_REG_CFG_CRCO_POS ) |            //
+            ( st->mode << NRF_REG_CFG_PRIM_RX_POS )               //
+        ),
+        (                                  
+            NRF_REG_CFG_MASK_RX_DR_MSK |   //
+            NRF_REG_CFG_MASK_TX_DS_MSK |   //
+            NRF_REG_CFG_MASK_MAX_RT_MSK |  //
+            NRF_REG_CFG_EN_CRC_MSK |       //
+            NRF_REG_CFG_CRCO_MSK |         //
+            NRF_REG_CFG_PRIM_RX_MSK        //
+        ) 
+    );
 
+    //******************************************
+    // NRF_REG_SETUP_AW
+    nRF_MaskWriteRegister(
+        obj,
+        NRF_REG_SETUP_AW,
+        ( 
+            ( st->addr_width << NRF_REG_SETUP_AW_POS )  //
+        ),
+        ( 
+            NRF_REG_SETUP_AW_MSK  //
+        )
+    );
+
+    //******************************************
+    // NRF_REG_SETUP_RETR
+    nRF_MaskWriteRegister(
+        obj,
+        NRF_REG_SETUP_RETR,
+        ( 
+            ( st->ard << NRF_REG_SETUP_RETR_ARD_POS ) |  //
+            ( st->arc << NRF_REG_SETUP_RETR_ARC_POS )    //
+        ),
+        ( 
+            NRF_REG_SETUP_RETR_ARD_MSK |  //
+            NRF_REG_SETUP_RETR_ARC_MSK    //
+        )
+    );
+
+    //******************************************
+    // NRF_REG_RF_CH
+    nRF_MaskWriteRegister(
+        obj,
+        NRF_REG_RF_CH,
+        ( 
+            ( st->rf_ch << NRF_REG_RF_CH_POS )  //
+        ),
+        ( 
+            NRF_REG_RF_CH_MSK  //
+        )
+    );
+
+    //******************************************
+    // NRF_REG_RF_SETUP
+    nRF_MaskWriteRegister(
+        obj,
+        NRF_REG_RF_SETUP,
+        ( 
+            ( st->cont_wave << NRF_REG_RF_SETUP_CONT_WAVE_POS ) | //
+            ( ((st->rf_data_rate & 0x2) >> 1) << NRF_REG_RF_SETUP_RF_DR_LOW_POS ) | //
+            ( ((st->rf_data_rate & 0x1) >> 0) << NRF_REG_RF_SETUP_RF_DR_HIGH_POS ) | //
+            ( st->rf_pwr << NRF_REG_RF_SETUP_RF_PWR_POS )
+        ),
+        ( 
+            NRF_REG_RF_SETUP_CONT_WAVE_MSK |    //
+            NRF_REG_RF_SETUP_RF_DR_LOW_MSK |    //
+            NRF_REG_RF_SETUP_RF_DR_HIGH_MSK |    //
+            NRF_REG_RF_SETUP_RF_PWR_MSK
+        )
+    );
+
+    //******************************************
+    // NRF_REG_FEATURE
+    nRF_MaskWriteRegister(
+        obj,
+        NRF_REG_FEATURE,
+        ( 
+            ( st->en_dypl << NRF_REG_FEATURE_EN_DPL_POS ) |  //
+            (st->en_ack_pay << NRF_REG_FEATURE_EN_ACK_PAY_POS) | //
+            (st->en_dyn_ack << NRF_REG_FEATURE_EN_DYN_ACK_POS) //
+        ),
+        ( 
+            NRF_REG_FEATURE_EN_DPL_MSK | //
+            NRF_REG_FEATURE_EN_DYN_ACK_MSK | //
+            NRF_REG_FEATURE_EN_DYN_ACK_MSK //
+        )
+    );
+    
+}
 //***********************************************************************
 /**
  * @brief  新增通道
@@ -238,8 +316,7 @@ nRF_statusReg_t nRF_TxPacket( nRF_T* obj, nRF_tx_packet_t* txPacket ) {
         }
         NRF_WRITE_REG_BYTE( obj, NRF_REG_STATUS, status.dataByte );  // clear status register.
     }
-    else if(status.max_rt == true) {
-        
+    else if ( status.max_rt == true ) {
     }
 }
 

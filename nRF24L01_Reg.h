@@ -20,12 +20,12 @@
 //-------------------------------------------------
 // NRF REG
 #define NRF_REG_CFG                         0x00
-#define NRF_REG_CFG_MAKE_RX_RD_POS          (6)
-#define NRF_REG_CFG_MAKE_RX_RD_MSK          (0x1<<NRF_REG_CFG_MAKE_RX_RD_POS)
-#define NRF_REG_CFG_MAKE_TX_RS_POS          (5)
-#define NRF_REG_CFG_MAKE_TX_RS_MSK          (0x1<<NRF_REG_CFG_MAKE_TX_RS_POS)
-#define NRF_REG_CFG_MAKE_MAX_RT_POS         (4)
-#define NRF_REG_CFG_MAKE_MAX_RT_MSK         (0x1<<NRF_REG_CFG_MAKE_MAX_RT_POS)
+#define NRF_REG_CFG_MASK_RX_DR_POS          (6)
+#define NRF_REG_CFG_MASK_RX_DR_MSK          (0x1<<NRF_REG_CFG_MASK_RX_DR_POS)
+#define NRF_REG_CFG_MASK_TX_DS_POS            (5)
+#define NRF_REG_CFG_MASK_TX_DS_MSK          (0x1<<NRF_REG_CFG_MASK_TX_DS_POS)
+#define NRF_REG_CFG_MASK_MAX_RT_POS         (4)
+#define NRF_REG_CFG_MASK_MAX_RT_MSK         (0x1<<NRF_REG_CFG_MASK_MAX_RT_POS)
 #define NRF_REG_CFG_EN_CRC_POS              (3)
 #define NRF_REG_CFG_EN_CRC_MSK              (0x1<<NRF_REG_CFG_EN_CRC_POS)
 #define NRF_REG_CFG_CRCO_POS                (2)
@@ -78,10 +78,14 @@
 #define NRF_REG_RF_CH_MSK                   (0x7F<<NRF_REG_RF_CH_POS)
 
 #define NRF_REG_RF_SETUP                    0x06
+#define NRF_REG_RF_SETUP_CONT_WAVE_POS      (7)
+#define NRF_REG_RF_SETUP_CONT_WAVE_MSK      (0x1<<NRF_REG_RF_SETUP_CONT_WAVE_POS)
+#define NRF_REG_RF_SETUP_RF_DR_LOW_POS      (5)
+#define NRF_REG_RF_SETUP_RF_DR_LOW_MSK      (0x1<<NRF_REG_RF_SETUP_RF_DR_LOW_POS)
 #define NRF_REG_RF_SETUP_PLL_LOCK_POS       (4)
 #define NRF_REG_RF_SETUP_PLL_LOCK_MSK       (0x1<<NRF_REG_RF_SETUP_PLL_LOCK_POS)
-#define NRF_REG_RF_SETUP_RF_DR_POS          (3)
-#define NRF_REG_RF_SETUP_RF_DR_MSK          (0x1<<NRF_REG_RF_SETUP_RF_DR_POS)
+#define NRF_REG_RF_SETUP_RF_DR_HIGH_POS     (3)
+#define NRF_REG_RF_SETUP_RF_DR_HIGH_MSK     (0x1<<NRF_REG_RF_SETUP_RF_DR_HIGH_POS)
 #define NRF_REG_RF_SETUP_RF_PWR_POS         (1)
 #define NRF_REG_RF_SETUP_RF_PWR_MSK         (0x3<<NRF_REG_RF_SETUP_RF_PWR_POS)
 #define NRF_REG_RF_SETUP_LNA_HCURR_POS      (0)

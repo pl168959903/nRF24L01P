@@ -35,6 +35,16 @@ static CommandBuffer_t* CommandBuffer_create( uint8_t cmd, uint8_t size ) {
     return retval;
 }
 
+//************************************************************************
+/**
+ * @brief  SPI 指令寫入
+ * @note   
+ * @param  nrf: 目標物件
+ * @param  command: 指令
+ * @param  array: 寫入資料陣列
+ * @param  length: 操作長度
+ * @retval 狀態暫存器
+ */
 nRF_statusReg_t nRF_SpiCmdWrite( nRF_T* nrf, uint8_t command, uint8_t* array, uint8_t length ) {
     CommandBuffer_t* cmdBuf = CommandBuffer_create( command, length );
     if ( length > 0 ) memcpy( cmdBuf->buffer, array, length );
@@ -44,6 +54,16 @@ nRF_statusReg_t nRF_SpiCmdWrite( nRF_T* nrf, uint8_t command, uint8_t* array, ui
     return nrf->statusRegister;
 }
 
+//************************************************************************
+/**
+ * @brief  SPI 指令讀取
+ * @note   
+ * @param  nrf: 目標物件
+ * @param  command: 指令
+ * @param  array: 賭取儲存陣列
+ * @param  length: 操作長度
+ * @retval 狀態暫存器
+ */
 nRF_statusReg_t nRF_SpiCmdRead( nRF_T* nrf, uint8_t command, uint8_t* array, uint8_t length ) {
     CommandBuffer_t* cmdBuf = CommandBuffer_create( command, length );
     nrf->interface->ReadWrite( ( uint8_t* )cmdBuf, ( uint8_t* )cmdBuf, length + 1 );

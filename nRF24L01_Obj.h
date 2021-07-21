@@ -112,8 +112,6 @@ typedef struct {
     // 需要初始化
     nRF_interface_T *interface;                 // 介面結構
     nRF_node_t *     rxNode[ 6 ];               // 接收節點結構
-    uint8_t          RxAddressHeader_0[ 4 ];    // 通道P0接收地址標頭
-    uint8_t          RxAddressHeader_1_6[ 4 ];  // 通道P1~P6接收地址標頭
 
     // 不需初始化
     nRF_tx_packet_t *txPacket;           // 傳送封包結構
