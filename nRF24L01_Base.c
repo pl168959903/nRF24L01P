@@ -72,3 +72,14 @@ nRF_statusReg_t nRF_SpiCmdRead( nRF_T* nrf, uint8_t command, uint8_t* array, uin
     free( cmdBuf );
     return nrf->statusRegister;
 }
+
+//************************************************************************
+/**
+ * @brief  中斷事件Handler
+ * @note   
+ * @param  nrf: 發生中斷物件
+ * @retval None
+ */
+void nRF_InterruptHandler(nRF_T* nrf){
+    nrf->interruptFlag == true;
+}

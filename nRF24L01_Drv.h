@@ -45,6 +45,12 @@ typedef struct {
     bool en_dyn_ack : 1;
 } nRF_general_setup_t;
 
+typedef enum {
+    
+}nRF_retval_e;
+
+
+
 /**
  * @brief  設定 RX 位址
  * @note
