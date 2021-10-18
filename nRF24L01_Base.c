@@ -81,5 +81,5 @@ nRF_statusReg_t nRF_SpiCmdRead( nRF_T* nrf, uint8_t command, uint8_t* array, uin
  * @retval None
  */
 void nRF_InterruptHandler(nRF_T* nrf){
-    nrf->interruptFlag == true;
+    //nrf->interruptFlag == true;
 }

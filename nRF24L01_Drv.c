@@ -59,7 +59,7 @@ void nRF_MaskWriteRegister( nRF_T* obj, uint8_t reg, uint8_t value, uint8_t mask
 void nRF_ClearInterruptFlag( nRF_T* obj ) {
     NRF_CLEAR_STATUS_REG( obj );
     NRF_NOP(obj);
-    obj->interruptFlag == false;
+    //obj->interruptFlag == false;
 }
 
 //***********************************************************************
@@ -317,7 +317,10 @@ nRF_statusReg_t nRF_TxPacket( nRF_T* obj, nRF_tx_packet_t* txPacket ) {
         nRF_ClearInterruptFlag( obj ); // clear status register.
     }
     else if ( obj->statusRegister.max_rt == true ) {
+			
     }
+
+		return 0;
 }
 
 //***********************************************************************
